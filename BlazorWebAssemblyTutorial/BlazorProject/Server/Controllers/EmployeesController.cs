@@ -107,5 +107,30 @@ namespace BlazorProject.Server.Controllers
         }
 
 
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> DeleteEmployee(int id)
+        {
+            try
+            {
+                var employeeToDelete = await employeeRepository.GetEmployee(id);
+
+                if (employeeToDelete == null)
+                {
+                    return NotFound($"Empoyee with Id = {id} not found.");
+                }
+
+                await employeeRepository.DeleteEmployee(id);
+
+                return Ok($"Empoyee with Id = {id} deleted.");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error deleting employee record.");
+            }
+        }
+
+
     }
 }
