@@ -1,5 +1,6 @@
 ﻿using BlazorProject.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace BlazorProject.Server.Models
 {
@@ -51,11 +52,12 @@ namespace BlazorProject.Server.Models
                 .FirstOrDefaultAsync(e => e.Email == email);
         }
 
-        public async Task<EmployeeDataResult> GetEmployees(int skip = 0, int take = 5)
+        public async Task<EmployeeDataResult> GetEmployees(int skip = 0, int take = 5, string orderBy = "EmployeeId")
         {
             EmployeeDataResult result = new EmployeeDataResult()
             {
-                Employees = appDbContext.Employees.Skip(skip).Take(take),
+                // Uses downloaded Nuget package System.Linq.Dynamic.Core for string orderBy
+                Employees = appDbContext.Employees.OrderBy(orderBy).Skip(skip).Take(take),
                 Count = await appDbContext.Employees.CountAsync()
             };
             return result;
