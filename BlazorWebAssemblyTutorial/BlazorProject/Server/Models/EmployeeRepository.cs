@@ -51,9 +51,14 @@ namespace BlazorProject.Server.Models
                 .FirstOrDefaultAsync(e => e.Email == email);
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployees()
+        public async Task<EmployeeDataResult> GetEmployees(int skip = 0, int take = 5)
         {
-            return await appDbContext.Employees.ToListAsync();
+            EmployeeDataResult result = new EmployeeDataResult()
+            {
+                Employees = appDbContext.Employees.Skip(skip).Take(take),
+                Count = await appDbContext.Employees.CountAsync()
+            };
+            return result;
         }
 
         public async Task<IEnumerable<Employee>> Search(string name, Gender? gender)

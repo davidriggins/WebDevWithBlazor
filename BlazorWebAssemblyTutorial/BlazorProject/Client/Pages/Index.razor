@@ -2,48 +2,28 @@
 @using BlazorProject.Shared
 @using Syncfusion.Blazor.Grids
 
-<style>
+@*<style>
     .e-spinner-pane .e-spinner-inner .e-spin-bootstrap5 {
         stroke: blue;
     }
 </style>
 
-<SfSpinner @bind-Visible="SpinnerVisible" Label="Loading Data..." Size="50" Type="@SpinnerType.Bootstrap5"></SfSpinner>
+<SfSpinner @bind-Visible="SpinnerVisible" Label="Loading Data..." Size="50" Type="@SpinnerType.Bootstrap5"></SfSpinner>*@
 
-@if (Employees != null)
-{
-    <SfGrid DataSource="@Employees" AllowPaging="true" AllowSorting="true" AllowMultiSorting="false">
-        <GridSortSettings AllowUnsort="false">
-            <GridSortColumns>
-                <GridSortColumn Field="EmployeeId" Direction="SortDirection.Descending"></GridSortColumn>
-            </GridSortColumns>
-        </GridSortSettings>
+    <SfGrid TValue="Employee" AllowPaging="true" AllowMultiSorting="false">
+
+        <SfDataManager Adaptor="Adaptors.CustomAdaptor" AdaptorInstance="@typeof(EmployeeAdaptor)"></SfDataManager>
         <GridPageSettings PageSize="5" PageSizes="@PagerDropdown" PageCount="3"></GridPageSettings>
         <GridColumns>
             <GridColumn Field=@nameof(Employee.EmployeeId) HeaderText="ID"></GridColumn>
             <GridColumn Field=@nameof(Employee.FirstName) HeaderText="First Name"></GridColumn>
             <GridColumn Field=@nameof(Employee.LastName) HeaderText="Last Name"></GridColumn>
-            <GridColumn AllowSorting="false" Field=@nameof(Employee.Email) HeaderText="Email"></GridColumn>
+            <GridColumn Field=@nameof(Employee.Email) HeaderText="Email"></GridColumn>
         </GridColumns>
     </SfGrid>
-}
 
 @code
 {
     public string[] PagerDropdown { get; set; } = new string[] { "All", "5", "10", "15", "20" };
-    public List<Employee> Employees { get; set; }
-
-    [Inject]
-    public IEmployeeService EmployeeService { get; set; }
-
-    public bool SpinnerVisible { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        SpinnerVisible = true;
-        //await Task.Delay(3000);
-        Employees = (await EmployeeService.GetEmployees()).ToList();
-        SpinnerVisible = false;
-    }
 
 }
