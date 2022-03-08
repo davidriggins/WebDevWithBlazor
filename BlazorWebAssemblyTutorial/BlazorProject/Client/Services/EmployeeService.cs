@@ -23,6 +23,11 @@ namespace BlazorProject.Client.Services
             throw new NotImplementedException();
         }
 
+        public async Task<IEnumerable<Employee>> GetAllEmployees()
+        {
+            return await httpClient.GetFromJsonAsync<IEnumerable<Employee>>("api/employees/all");
+        }
+
         public Task<Employee> GetEmployee(int employeeId)
         {
             throw new NotImplementedException();
@@ -37,6 +42,11 @@ namespace BlazorProject.Client.Services
         {
             return await httpClient
                 .GetFromJsonAsync<EmployeeDataResult>($"/api/employees?skip={skip}&take={take}&orderBy={orderBy}");
+        }
+
+        public Task<IEnumerable<Employee>> GetEmployees()
+        {
+            throw new NotImplementedException();
         }
 
         public Task<IEnumerable<Employee>> Search(string name, Gender? gender)
