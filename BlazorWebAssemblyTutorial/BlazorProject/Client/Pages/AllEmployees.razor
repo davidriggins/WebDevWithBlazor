@@ -3,22 +3,15 @@
 @using Syncfusion.Blazor.Grids
 
 <div style="width:1100px">
-    <SfGrid DataSource="@Employees" AllowGrouping="true">
-        <GridGroupSettings ShowGroupedColumn="true">
-            <CaptionTemplate>
-                @{
-                    var employee = (context as CaptionTemplateContext);
-                    <div>@employee.Field : @employee.Key - @employee.Count Employees</div>
-                }
-            </CaptionTemplate>
-        </GridGroupSettings>
+    <SfGrid DataSource="@Employees"AllowPaging="true" AllowFiltering="true">
+        <GridFilterSettings Mode="FilterBarMode.Immediate" ImmediateModeDelay="200"></GridFilterSettings>
         <GridColumns>
             <GridColumn Field=@nameof(Employee.EmployeeId) HeaderText="ID"></GridColumn>
             <GridColumn Field=@nameof(Employee.FirstName) HeaderText="First Name"></GridColumn>
             <GridColumn Field=@nameof(Employee.LastName) HeaderText="Last Name"></GridColumn>
-            <GridColumn Format="d" Field=@nameof(Employee.DateOfBirth) HeaderText="Date of Birth"></GridColumn>
+            <GridColumn Field=@nameof(Employee.DateOfBirth) HeaderText="Date of Birth"></GridColumn>
             <GridColumn Field=@nameof(Employee.Gender) HeaderText="Gender"></GridColumn>
-            <GridColumn AllowGrouping="false" Field=@nameof(Employee.Email) HeaderText="Email"></GridColumn>
+            <GridColumn Field=@nameof(Employee.Email) HeaderText="Email"></GridColumn>
         </GridColumns>
     </SfGrid>
 </div>
