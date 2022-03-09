@@ -1,12 +1,21 @@
 ﻿@page "/gridedit"
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Buttons
 @using BlazorProject.Shared
 
 <div style="width:800px">
     <SfGrid @ref="employeeGrid" DataSource="@Employees" AllowPaging="true"
             Toolbar="@(new List<string>() { "Add", "Edit", "Update", "Delete", "Cancel" })">
-        <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true"></GridEditSettings>
+        <GridEditSettings Mode="EditMode.Dialog" AllowAdding="true" AllowEditing="true" AllowDeleting="true">
+            <HeaderTemplate>
+                <span>@GetHeaderText(context as Employee)</span>
+            </HeaderTemplate>
+            <FooterTemplate>
+                <SfButton OnClick="@Save" IsPrimary="true">@SaveButtonText</SfButton>
+                <SfButton OnClick="@Cancel">Cancel</SfButton>
+            </FooterTemplate>
+        </GridEditSettings>
         <GridPageSettings PageSize="5"></GridPageSettings>
         <GridEvents OnActionBegin="ActionBeginHandler" TValue="Employee">
         </GridEvents>
@@ -17,7 +26,10 @@
             <GridColumn Field=@nameof(Employee.LastName) HeaderText=" Last Name"></GridColumn>
             <GridColumn Field=@nameof(Employee.DateOfBirth) Format="d" HeaderText="Date of Birth">
             </GridColumn>
-            <GridColumn Field="Department.DepartmentName" HeaderText="Department" Width="140px">
+            <GridColumn Field=@nameof(Employee.DepartmentId) HeaderText="Department" Width="140px">
+                <Template>
+                    <span>@GetDepartmentNameById((context as Employee).DepartmentId)</span>
+                </Template>
                 <EditTemplate>
                     <SfDropDownList DataSource="@Departments" TItem="Department" TValue="int"
                                     @bind-Value="@((context as Employee).DepartmentId)">
@@ -44,6 +56,8 @@
 
     public List<Department> Departments { get; set; }
 
+    public string SaveButtonText { get; set; }
+
     public SfGrid<Employee> employeeGrid { get; set; }
 
     public string[] GenderEnumValues { get; set; } = Enum.GetNames(typeof(Gender));
@@ -60,6 +74,40 @@
     {
         Employees = (await EmployeeService.GetAllEmployees()).ToList();
         Departments = (await DepartmentService.GetAllDepartments()).ToList();
+    }
+
+    public string GetDepartmentNameById(int id)
+    {
+        if (id == 0)
+        {
+            return null;
+        }
+
+        return Departments.FirstOrDefault(d => d.DepartmentId == id).DepartmentName;
+    }
+
+    public async Task Cancel()
+    {
+        await employeeGrid.CloseEditAsync();
+    }
+
+    public async Task Save()
+    {
+        await employeeGrid.EndEditAsync();
+    }
+
+    public string GetHeaderText(Employee employee)
+    {
+        if (employee.EmployeeId == 0)
+        {
+            SaveButtonText = "Add";
+            return "Add New Employee";
+        }
+        else
+        {
+            SaveButtonText = "Update";
+            return $"Edit {employee.FirstName} Details";
+        }
     }
 
     public async void ActionBeginHandler(ActionEventArgs<Employee> Args)
