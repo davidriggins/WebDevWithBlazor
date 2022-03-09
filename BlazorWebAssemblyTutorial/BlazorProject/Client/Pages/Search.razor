@@ -1,0 +1,53 @@
+﻿@page "/search"
+@using BlazorProject.Shared
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+
+@{
+    //var SearchTool = new List<string>() { "Search" };
+    //var SearchColumns = new string[] { "FirstName", "LastName" };
+}
+<div style="width:700px">
+    <SfGrid @ref="employeeGrid" DataSource="@Employees" AllowPaging="true">
+    @*<SfGrid DataSource="@Employees" AllowPaging="true" Toolbar="@SearchTool">*@
+        <SfToolbar>
+            <ToolbarItems>
+                <ToolbarItem Type="ItemType.Input" Align="ItemAlign.Right">
+                    <Template>
+                        <SfTextBox Placeholder="Search" Input="OnInput"></SfTextBox>
+                    </Template>
+                </ToolbarItem>
+            </ToolbarItems>
+        </SfToolbar>
+        <GridSearchSettings></GridSearchSettings>
+        @*<GridSearchSettings Fields="@SearchColumns"></GridSearchSettings>*@
+        <GridPageSettings PageSize="5"></GridPageSettings>
+        <GridColumns>
+            <GridColumn Field=@nameof(Employee.EmployeeId) HeaderText="ID"></GridColumn>
+            <GridColumn Field=@nameof(Employee.FirstName) HeaderText="First Name"></GridColumn>
+            <GridColumn Field=@nameof(Employee.LastName) HeaderText=" Last Name"></GridColumn>
+            <GridColumn Field=@nameof(Employee.DateOfBirth) HeaderText="Date of Birth"></GridColumn>
+            <GridColumn Field=@nameof(Employee.Gender) HeaderText="Gender"></GridColumn>
+            <GridColumn Field=@nameof(Employee.Email) HeaderText="Email"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+</div>
+
+@code {
+    public List<Employee> Employees { get; set; }
+    public SfGrid<Employee> employeeGrid { get; set; }
+
+    [Inject]
+    public IEmployeeService EmployeeService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Employees = (await EmployeeService.GetAllEmployees()).ToList();
+    }
+
+    private async void OnInput(InputEventArgs args)
+    {
+        await this.employeeGrid.SearchAsync(args.Value);
+    }
+}
