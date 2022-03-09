@@ -41,7 +41,7 @@ namespace BlazorProject.Server.Models
 
         public async Task<IEnumerable<Employee>> GetAllEmployees()
         {
-            return await appDbContext.Employees.ToListAsync();
+            return await appDbContext.Employees.Include(e => e.Department).ToListAsync();
         }
 
         public async Task<Employee> GetEmployee(int employeeId)
