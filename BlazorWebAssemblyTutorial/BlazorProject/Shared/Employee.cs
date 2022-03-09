@@ -17,8 +17,15 @@ namespace BlazorProject.Shared
 
         [Required]
         public string LastName { get; set;}
+
+        [EmailAddress]
         public string Email { get; set; }
+
+        [DisplayFormat(DataFormatString = "d")]
+        [Display(Name = "DOB")]
+        //[Editable(false)]
         public DateTime DateOfBirth { get; set; }
+
         public Gender Gender { get; set; }
         public int DepartmentId { get; set; }
         public string PhotoPath { get; set; }

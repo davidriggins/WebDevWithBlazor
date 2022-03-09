@@ -5,7 +5,7 @@
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.DropDowns
 
-<div style="width:650px">
+<div style="width:850px">
     <SfGrid @ref="employeeGrid" DataSource="@Employees" AllowPaging="true"
             Toolbar="@(new List<string>() { "Add", "Cancel" })">
         <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true">
@@ -15,8 +15,10 @@
         <GridColumns>
             <GridColumn AllowAdding="false" IsPrimaryKey="true" Field=@nameof(Employee.EmployeeId)
                         HeaderText="ID" Width="60px"></GridColumn>
-            <GridColumn Field=@nameof(Employee.FirstName) HeaderText="First Name"></GridColumn>
-            <GridColumn Field=@nameof(Employee.LastName) HeaderText=" Last Name"></GridColumn>
+            <GridColumn Field=@nameof(Employee.FirstName) HeaderText="First Name"
+                        ValidationRules="@(new ValidationRules() { Required = true, MinLength = 2 })"></GridColumn>
+            <GridColumn Field=@nameof(Employee.LastName) HeaderText=" Last Name"
+                        ValidationRules="@(new ValidationRules() { Required = true, MinLength = 2 })"></GridColumn>
             <GridColumn Field=@nameof(Employee.DateOfBirth) Format="d" HeaderText="Date of Birth"></GridColumn>
             <GridColumn Field=@nameof(Employee.Gender) HeaderText="Gender" Width="140px">
                 <EditTemplate>
@@ -25,6 +27,7 @@
                     </SfDropDownList>
                 </EditTemplate>
             </GridColumn>
+            <GridColumn Field=@nameof(Employee.Email) HeaderText="Email"></GridColumn>
             <GridColumn HeaderText="Actions" Width="110">
                 <GridCommandColumns>
                     <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() {
