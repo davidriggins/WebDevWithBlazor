@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlazorProject.Shared.Utilities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,6 +20,8 @@ namespace BlazorProject.Shared
         public string LastName { get; set;}
 
         [EmailAddress]
+        [AllowedEmailDomainAttribute("dell.com")]
+        //[AllowedEmailDomainAttribute("dell.com", ErrorMessage = "Invalid Domain")]
         public string Email { get; set; }
 
         [DisplayFormat(DataFormatString = "d")]
