@@ -12,20 +12,20 @@ namespace BlazorProject.Client.Services
             this.httpClient = httpClient;
         }
 
-
-        public Task<Employee> AddEmployee(Employee employee)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteEmployee(int employeeId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IEnumerable<Employee>> GetAllEmployees()
         {
-            return await httpClient.GetFromJsonAsync<IEnumerable<Employee>>("api/employees/all");
+            return await httpClient.GetFromJsonAsync<IEnumerable<Employee>>("/api/employees/all");
+        }
+
+        public async Task<Employee> AddEmployee(Employee employee)
+        {
+            var response = await httpClient.PostAsJsonAsync<Employee>("/api/employees", employee);
+            return await response.Content.ReadFromJsonAsync<Employee>();
+        }
+
+        public async Task DeleteEmployee(int employeeId)
+        {
+            await httpClient.DeleteAsync($"/api/employees/{employeeId}");
         }
 
         public Task<Employee> GetEmployee(int employeeId)
@@ -40,13 +40,8 @@ namespace BlazorProject.Client.Services
 
         public async Task<EmployeeDataResult> GetEmployees(int skip, int take, string orderBy)
         {
-            return await httpClient
-                .GetFromJsonAsync<EmployeeDataResult>($"/api/employees?skip={skip}&take={take}&orderBy={orderBy}");
-        }
-
-        public Task<IEnumerable<Employee>> GetEmployees()
-        {
-            throw new NotImplementedException();
+            return await httpClient.GetFromJsonAsync<EmployeeDataResult>
+                ($"/api/employees?skip={skip}&take={take}&orderBy={orderBy}");
         }
 
         public Task<IEnumerable<Employee>> Search(string name, Gender? gender)
@@ -54,9 +49,11 @@ namespace BlazorProject.Client.Services
             throw new NotImplementedException();
         }
 
-        public Task<Employee> UpdateEmployee(Employee employee)
+        public async Task<Employee> UpdateEmployee(Employee employee)
         {
-            throw new NotImplementedException();
+            var response = await httpClient
+                .PutAsJsonAsync<Employee>($"/api/employees/{employee.EmployeeId}", employee);
+            return await response.Content.ReadFromJsonAsync<Employee>();
         }
     }
 }

@@ -16,9 +16,8 @@ namespace BlazorProject.Server.Controllers
             this.employeeRepository = employeeRepository;
         }
 
-
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllEmployees()
+        public async Task<ActionResult> GetAllEmployees()
         {
             try
             {
@@ -27,12 +26,11 @@ namespace BlazorProject.Server.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                    "Error retrieving data from the database");
             }
         }
 
-
-        [HttpGet("{search}")]
+        [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Employee>>> Search(string name, Gender? gender)
         {
             try
@@ -49,9 +47,8 @@ namespace BlazorProject.Server.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                "Error retrieving data from the database");
             }
-
         }
 
         [HttpGet]
@@ -64,9 +61,8 @@ namespace BlazorProject.Server.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                    "Error retrieving data from the database");
             }
-
         }
 
         [HttpGet("{id:int}")]
@@ -74,7 +70,7 @@ namespace BlazorProject.Server.Controllers
         {
             try
             {
-                var result =await employeeRepository.GetEmployee(id);
+                var result = await employeeRepository.GetEmployee(id);
 
                 if (result == null)
                 {
@@ -86,7 +82,7 @@ namespace BlazorProject.Server.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                    "Error retrieving data from the database");
             }
         }
 
@@ -102,22 +98,21 @@ namespace BlazorProject.Server.Controllers
 
                 if (emp != null)
                 {
-                    ModelState.AddModelError("Email", "Employee email already in use.");
+                    ModelState.AddModelError("Email", "Employee email already in use");
                     return BadRequest(ModelState);
                 }
 
                 var createdEmployee = await employeeRepository.AddEmployee(employee);
 
                 return CreatedAtAction(nameof(GetEmployee),
-                    new {id = createdEmployee.EmployeeId }, createdEmployee);
+                    new { id = createdEmployee.EmployeeId }, createdEmployee);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error creating new employee record.");
+                    "Error creating new employee record");
             }
         }
-
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult<Employee>> UpdateEmployee(int id, Employee employee)
@@ -125,25 +120,23 @@ namespace BlazorProject.Server.Controllers
             try
             {
                 if (id != employee.EmployeeId)
-                    return BadRequest("Employee ID mismatch.");
+                    return BadRequest("Employee ID mismatch");
 
                 var employeeToUpdate = await employeeRepository.GetEmployee(id);
 
                 if (employeeToUpdate == null)
                 {
-                    return NotFound($"Empoyee with Id = {id} not found.");
+                    return NotFound($"Employee with Id = {id} not found");
                 }
 
                 return await employeeRepository.UpdateEmployee(employee);
-
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating employee record.");
+                    "Error updating employee record");
             }
         }
-
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteEmployee(int id)
@@ -154,21 +147,18 @@ namespace BlazorProject.Server.Controllers
 
                 if (employeeToDelete == null)
                 {
-                    return NotFound($"Empoyee with Id = {id} not found.");
+                    return NotFound($"Employee with Id = {id} not found");
                 }
 
                 await employeeRepository.DeleteEmployee(id);
 
-                return Ok($"Empoyee with Id = {id} deleted.");
-
+                return Ok($"Employee with Id = {id} deleted");
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting employee record.");
+                    "Error deleting employee record");
             }
         }
-
-
     }
 }

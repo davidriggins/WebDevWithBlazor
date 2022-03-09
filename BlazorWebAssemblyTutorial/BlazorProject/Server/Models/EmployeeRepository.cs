@@ -7,23 +7,38 @@ namespace BlazorProject.Server.Models
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly AppDbContext appDbContext;
+        private readonly IDepartmentRepository departmentRepository;
 
-        public EmployeeRepository(AppDbContext appDbContext)
+        public EmployeeRepository(AppDbContext appDbContext, IDepartmentRepository departmentRepository)
         {
             this.appDbContext = appDbContext;
+            this.departmentRepository = departmentRepository;
         }
 
+        public async Task<IEnumerable<Employee>> GetAllEmployees()
+        {
+            return await appDbContext.Employees.Include(e => e.Department).ToListAsync();
+        }
 
         public async Task<Employee> AddEmployee(Employee employee)
         {
-            if (employee.Department != null)
+            if (employee.DepartmentId == 0)
             {
-                appDbContext.Entry(employee.Department).State = EntityState.Unchanged;
+                throw new Exception("Employee DepartmentId cannot be ZERO");
+            }
+            else
+            {
+                Department department = await this.departmentRepository
+                    .GetDepartment(employee.DepartmentId);
+                if (department == null)
+                {
+                    throw new Exception($"Invalid Employee DepartmentId {employee.DepartmentId}");
+                }
+                employee.Department = department;
             }
 
             var result = await appDbContext.Employees.AddAsync(employee);
             await appDbContext.SaveChangesAsync();
-
             return result.Entity;
         }
 
@@ -39,11 +54,6 @@ namespace BlazorProject.Server.Models
             }
         }
 
-        public async Task<IEnumerable<Employee>> GetAllEmployees()
-        {
-            return await appDbContext.Employees.Include(e => e.Department).ToListAsync();
-        }
-
         public async Task<Employee> GetEmployee(int employeeId)
         {
             return await appDbContext.Employees
@@ -57,14 +67,15 @@ namespace BlazorProject.Server.Models
                 .FirstOrDefaultAsync(e => e.Email == email);
         }
 
-        public async Task<EmployeeDataResult> GetEmployees(int skip = 0, int take = 5, string orderBy = "EmployeeId")
+        public async Task<EmployeeDataResult> GetEmployees
+            (int skip = 0, int take = 5, string orderBy = "EmployeeId")
         {
             EmployeeDataResult result = new EmployeeDataResult()
             {
-                // Uses downloaded Nuget package System.Linq.Dynamic.Core for string orderBy
                 Employees = appDbContext.Employees.OrderBy(orderBy).Skip(skip).Take(take),
                 Count = await appDbContext.Employees.CountAsync()
             };
+
             return result;
         }
 

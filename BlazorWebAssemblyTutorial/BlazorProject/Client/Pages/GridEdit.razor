@@ -1,30 +1,35 @@
 ﻿@page "/gridedit"
-@using BlazorProject.Shared
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.DropDowns
+@using BlazorProject.Shared
 
-<div style="width:750px">
-    <SfGrid DataSource="@Employees" AllowPaging="true"
-            Toolbar="@(new List<string>() { "Add", "Edit", "Update", "Delete", "Cancel"})">
+<div style="width:800px">
+    <SfGrid @ref="employeeGrid" DataSource="@Employees" AllowPaging="true"
+            Toolbar="@(new List<string>() { "Add", "Edit", "Update", "Delete", "Cancel" })">
         <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true"></GridEditSettings>
         <GridPageSettings PageSize="5"></GridPageSettings>
+        <GridEvents OnActionBegin="ActionBeginHandler" TValue="Employee">
+        </GridEvents>
         <GridColumns>
-            <GridColumn IsPrimaryKey="true" Field=@nameof(Employee.EmployeeId) HeaderText="ID"></GridColumn>
+            <GridColumn IsPrimaryKey="true" Field=@nameof(Employee.EmployeeId) HeaderText="ID" Width="60px">
+            </GridColumn>
             <GridColumn Field=@nameof(Employee.FirstName) HeaderText="First Name"></GridColumn>
             <GridColumn Field=@nameof(Employee.LastName) HeaderText=" Last Name"></GridColumn>
-            <GridColumn Field=@nameof(Employee.DateOfBirth) Format="d" HeaderText="Date of Birth"></GridColumn>
+            <GridColumn Field=@nameof(Employee.DateOfBirth) Format="d" HeaderText="Date of Birth">
+            </GridColumn>
             <GridColumn Field="Department.DepartmentName" HeaderText="Department" Width="140px">
                 <EditTemplate>
-                    <SfDropDownList DataSource="@Departments" TItem="Department" TValue="int" @bind-Value="@((context as Employee).DepartmentId)">
-                        <DropDownListFieldSettings Text="DepartmentName" Value="DepartmentId"></DropDownListFieldSettings>
+                    <SfDropDownList DataSource="@Departments" TItem="Department" TValue="int"
+                                    @bind-Value="@((context as Employee).DepartmentId)">
+                        <DropDownListFieldSettings Text="DepartmentName" Value="DepartmentId">
+                        </DropDownListFieldSettings>
                     </SfDropDownList>
                 </EditTemplate>
             </GridColumn>
             <GridColumn Field=@nameof(Employee.Gender) HeaderText="Gender" Width="140px">
                 <EditTemplate>
-                    <SfDropDownList DataSource="@GenderEnumValues" TItem="string" TValue="Gender" @bind-Value="@((context as Employee).Gender)">
-                        @*// Dont need this for enum binding*@
-                        @*<DropDownListFieldSettings Text="DepartmentName" Value="DepartmentId"></DropDownListFieldSettings>*@
+                    <SfDropDownList DataSource="@GenderEnumValues" TItem="string" TValue="Gender"
+                                    @bind-Value="@((context as Employee).Gender)">
                     </SfDropDownList>
                 </EditTemplate>
             </GridColumn>
@@ -34,18 +39,47 @@
 </div>
 
 @code {
+
     public List<Employee> Employees { get; set; }
+
     public List<Department> Departments { get; set; }
+
+    public SfGrid<Employee> employeeGrid { get; set; }
+
     public string[] GenderEnumValues { get; set; } = Enum.GetNames(typeof(Gender));
+
 
     [Inject]
     public IEmployeeService EmployeeService { get; set; }
+
     [Inject]
     public IDepartmentService DepartmentService { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
         Employees = (await EmployeeService.GetAllEmployees()).ToList();
         Departments = (await DepartmentService.GetAllDepartments()).ToList();
+    }
+
+    public async void ActionBeginHandler(ActionEventArgs<Employee> Args)
+    {
+        if (Args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            if (Args.Action == "Add")
+            {
+                await EmployeeService.AddEmployee(Args.Data);
+                Employees = (await EmployeeService.GetAllEmployees()).ToList();
+                employeeGrid.Refresh();
+            }
+            else
+            {
+                await EmployeeService.UpdateEmployee(Args.Data);
+            }
+        }
+        if (Args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            await EmployeeService.DeleteEmployee(Args.Data.EmployeeId);
+        }
     }
 }
