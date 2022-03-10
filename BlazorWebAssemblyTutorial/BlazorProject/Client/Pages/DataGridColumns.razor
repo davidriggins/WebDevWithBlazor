@@ -1,0 +1,35 @@
+﻿@*@page "/"*@
+@page "/datagridcolumns"
+@using BlazorProject.Shared
+@using Syncfusion.Blazor.Grids
+
+<SfGrid DataSource="@Employees" AllowTextWrap="true">
+    <GridEditSettings AllowEditing="true"></GridEditSettings>
+    <GridColumns>
+        @foreach (var prop in typeof(Employee).GetProperties())
+        {
+            if (ColumnsToDisplay.Contains(prop.Name))
+            {
+                <GridColumn Field="@prop.Name" AllowEditing="@EditableColumns.Contains(prop.Name)"></GridColumn>
+            }
+        }
+        <GridColumn Field="Department.DepartmentName" HeaderText="Dept Name"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code{
+
+    public List<Employee> Employees { get; set; }
+
+    public List<string> ColumnsToDisplay = new List<string>() { "EmployeeId", "FirstName", "LastName", "Email" };
+
+    public List<string> EditableColumns = new List<string>() {"FirstName", "LastName" };
+
+    [Inject]
+    public IEmployeeService EmployeeService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Employees = (await EmployeeService.GetAllEmployees()).ToList();
+    }
+}
